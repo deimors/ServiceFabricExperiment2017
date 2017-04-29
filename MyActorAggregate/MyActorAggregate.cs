@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.ServiceFabric.Actors;
+﻿using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Data.Collections;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using MyActorAggregate.Interfaces;
-using Microsoft.ServiceFabric.Services.Remoting.Runtime;
-using Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime;
+using System;
+using System.Collections.Generic;
+using System.Fabric;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MyActorAggregate
 {
@@ -69,28 +67,6 @@ namespace MyActorAggregate
 			}
 		}
 
-		private async Task<IReliableDictionary<ActorId, ActorId>> GetActors()
-		{
-			return await StateManager.GetOrAddAsync<IReliableDictionary<ActorId, ActorId>>("actors");
-		}
-
-		/// <summary>
-		/// Optional override to create listeners (e.g., HTTP, Service Remoting, WCF, etc.) for this service replica to handle client or user requests.
-		/// </summary>
-		/// <remarks>
-		/// For more information on service communication, see https://aka.ms/servicefabricservicecommunication
-		/// </remarks>
-		/// <returns>A collection of listeners.</returns>
-		protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
-		{
-			//yield return new ServiceReplicaListener(context => this.CreateServiceRemotingListener(context));
-			//yield return new ServiceReplicaListener(context => new FabricTransportServiceRemotingListener(context, this));
-			return new[]
-			{
-				new ServiceReplicaListener(context => this.CreateServiceRemotingListener(context))
-			};
-		}
-
 		public async Task<bool> Contains(ActorId actorId)
 		{
 			var actors = await GetActors();
@@ -105,6 +81,24 @@ namespace MyActorAggregate
 			}
 		}
 
+		private async Task<IReliableDictionary<ActorId, ActorId>> GetActors()
+		{
+			return await StateManager.GetOrAddAsync<IReliableDictionary<ActorId, ActorId>>("actors");
+		}
+
+		/// <summary>
+		/// Optional override to create listeners (e.g., HTTP, Service Remoting, WCF, etc.) for this service replica to handle client or user requests.
+		/// </summary>
+		/// <remarks>
+		/// For more information on service communication, see https://aka.ms/servicefabricservicecommunication
+		/// </remarks>
+		/// <returns>A collection of listeners.</returns>
+		protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
+			=> new[]
+			{
+				new ServiceReplicaListener(context => this.CreateServiceRemotingListener(context))
+			};
+		
 		/// <summary>
 		/// This is the main entry point for your service replica.
 		/// This method executes when this replica of your service becomes primary and has write status.
