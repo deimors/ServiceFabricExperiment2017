@@ -1,9 +1,5 @@
 ﻿using Microsoft.ServiceFabric.Actors;
 using Microsoft.ServiceFabric.Services.Remoting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MyActorAggregate.Interfaces
@@ -15,5 +11,7 @@ namespace MyActorAggregate.Interfaces
 		Task<ActorId[]> GetAll();
 
 		Task<bool> Contains(ActorId actorId);
+
+		Task<bool> Delete(ActorId actorId);
 	}
 }

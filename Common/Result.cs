@@ -44,6 +44,12 @@ namespace Common
 
 	public static class ResultExtensions
 	{
+		public static T Match<T, TSuccess>(this Result<TSuccess, T> result, Func<TSuccess, T> onSuccess)
+			=> result.Match(onSuccess, error => error);
+
+		public static Task<T> MatchAsync<T, TSuccess>(this Result<TSuccess, T> result, Func<TSuccess, Task<T>> onSuccess)
+			=> result.Match(onSuccess, error => Task.FromResult(error));
+
 		public static async Task<T> MatchAsync<T, TSuccess, TFail>(this Task<Result<TSuccess, TFail>> result, Func<TSuccess, Task<T>> onSuccess, Func<TFail, Task<T>> onFail)
 			=> await (await result).Match(value => onSuccess(value), error => onFail(error));
 

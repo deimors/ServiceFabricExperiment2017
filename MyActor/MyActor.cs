@@ -61,7 +61,7 @@ namespace MyActor
         /// </summary>
         /// <param name="count"></param>
         /// <returns></returns>
-        Task IMyActor.SetCountAsync(int count, CancellationToken cancellationToken)
+        Task<int> IMyActor.SetCountAsync(int count, CancellationToken cancellationToken)
         {
             // Requests are not guaranteed to be processed in order nor at most once.
             // The update function here verifies that the incoming count is greater than the current count to preserve order.
