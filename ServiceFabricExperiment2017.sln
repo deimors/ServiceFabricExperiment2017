@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyActorAggregate.Interfaces
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{A8815CC6-B59A-4D2A-A07B-E1111FEC4166}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreWeb.Tests", "CoreWeb.Tests\CoreWeb.Tests.csproj", "{F3C4C5A3-4142-4BE5-8D2A-B08BC5B6DA39}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,14 @@ Global
 		{A8815CC6-B59A-4D2A-A07B-E1111FEC4166}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A8815CC6-B59A-4D2A-A07B-E1111FEC4166}.Release|x64.ActiveCfg = Release|Any CPU
 		{A8815CC6-B59A-4D2A-A07B-E1111FEC4166}.Release|x64.Build.0 = Release|Any CPU
+		{F3C4C5A3-4142-4BE5-8D2A-B08BC5B6DA39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3C4C5A3-4142-4BE5-8D2A-B08BC5B6DA39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3C4C5A3-4142-4BE5-8D2A-B08BC5B6DA39}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F3C4C5A3-4142-4BE5-8D2A-B08BC5B6DA39}.Debug|x64.Build.0 = Debug|Any CPU
+		{F3C4C5A3-4142-4BE5-8D2A-B08BC5B6DA39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3C4C5A3-4142-4BE5-8D2A-B08BC5B6DA39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3C4C5A3-4142-4BE5-8D2A-B08BC5B6DA39}.Release|x64.ActiveCfg = Release|Any CPU
+		{F3C4C5A3-4142-4BE5-8D2A-B08BC5B6DA39}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

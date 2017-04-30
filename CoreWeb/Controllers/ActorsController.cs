@@ -17,48 +17,50 @@ namespace CoreWeb.Controllers
 	{
 		private readonly IMyActorAggregateFactory _aggregateFactory;
 		private readonly IMyActorFactory _actorFactory;
-		
+
 		public ActorsController(IMyActorAggregateFactory aggregateFactory, IMyActorFactory actorFactory)
 		{
 			_aggregateFactory = aggregateFactory;
 			_actorFactory = actorFactory;
 		}
-		
+
 		[HttpGet]
-		public async Task<IEnumerable<Guid>> Get()
-			=> (await GetActorAggregate().GetAll())
-				.Select(actorId => actorId.GetGuidId());
+		public async Task<IActionResult> Get()
+			=> SuccessResult((await GetActorAggregate().GetAll()).Select(actorId => actorId.GetGuidId()));
 
 		[HttpGet("{id}")]
 		public Task<IActionResult> Get(string id)
-			=> WithActor(id).MatchAsync(async actor => SuccessResult(await actor.GetCountAsync(CancellationToken.None)));
-		
+			=> WithActor(id).MatchAsync(actor => GetActorCount(actor));
+
+		private async Task<IActionResult> GetActorCount(IMyActor actor)
+			=> SuccessResult(await actor.GetCountAsync(CancellationToken.None));
+
 		[HttpPost]
-		public async Task<Guid> Post([FromBody]int value)
+		public async Task<IActionResult> Post([FromBody]int value)
 		{
-			var actorAggregate = GetActorAggregate();
+			var newActorId = await GetActorAggregate().Create();
+			
+			await GetActor(newActorId).SetCountAsync(value, CancellationToken.None);
 
-			var newActorId = await actorAggregate.Create();
-
-			var actor = GetActor(newActorId);
-
-			await actor.SetCountAsync(value, CancellationToken.None);
-
-			return newActorId.GetGuidId();
+			return SuccessResult(newActorId.GetGuidId());
 		}
-		
+
 		[HttpPut("{id}")]
 		public Task<IActionResult> Put(string id, [FromBody]int value)
-			=> WithActor(id).MatchAsync(async actor => SuccessResult(await actor.SetCountAsync(value, CancellationToken.None)));
+			=> WithActor(id).MatchAsync(actor => SetActorCount(actor, value));
+
+		private async Task<IActionResult> SetActorCount(IMyActor actor, int value)
+			=> SuccessResult(await actor.SetCountAsync(value, CancellationToken.None));
 
 		[HttpDelete("{id}")]
 		public Task<IActionResult> Delete(string id)
-			=> ParseActorId(id).MatchAsync(
-				async actorId => (await GetActorAggregate().Delete(actorId))
-					? SuccessResult() 
-					: UnknownActorResult(actorId)
-			);
-		
+			=> ParseActorId(id).MatchAsync(actorId => DeleteActor(actorId));
+
+		private async Task<IActionResult> DeleteActor(ActorId actorId)
+			=> (await GetActorAggregate().Delete(actorId))
+				? SuccessResult()
+				: UnknownActorResult(actorId);
+
 		private Result<ActorId, IActionResult> ParseActorId(string id)
 			=> Guid.TryParse(id, out Guid guidId)
 				? Result<ActorId, IActionResult>.Succeed(new ActorId(guidId))
@@ -71,7 +73,7 @@ namespace CoreWeb.Controllers
 
 		private Task<Result<IMyActor, IActionResult>> WithActor(string id)
 			=> ParseActorId(id).Match(
-				actorId => WithActor(actorId), 
+				actorId => WithActor(actorId),
 				error => Task.FromResult(Result<IMyActor, IActionResult>.Fail(error))
 			);
 
