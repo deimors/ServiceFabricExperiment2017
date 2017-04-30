@@ -164,9 +164,25 @@ namespace CoreWeb.Tests.Controllers
 			}
 
 			[Theory, Arrange]
-			public async Task GetWithRandomGuidReturnsNotFoundResult(ActorsController sut, Guid randomId, int value)
+			public async Task PutWithRandomGuidReturnsNotFoundResult(ActorsController sut, Guid randomId, int value)
 			{
 				var result = await sut.Put(randomId.ToString(), value);
+
+				result.Should().BeOfType<NotFoundObjectResult>();
+			}
+
+			[Theory, Arrange]
+			public async Task DeleteWithRandomStringIdReturnsBadRequestResult(ActorsController sut, string randomId)
+			{
+				var result = await sut.Delete(randomId);
+
+				result.Should().BeOfType<BadRequestObjectResult>();
+			}
+
+			[Theory, Arrange]
+			public async Task DeleteWithRandomGuidReturnsNotFoundResult(ActorsController sut, Guid randomId)
+			{
+				var result = await sut.Delete(randomId.ToString());
 
 				result.Should().BeOfType<NotFoundObjectResult>();
 			}
@@ -174,22 +190,120 @@ namespace CoreWeb.Tests.Controllers
 
 		public class WhenOneActor
 		{
+			private const int _expectedValue = 42;
+
 			public class Arrange : AutoDataAttribute
 			{
 				public Arrange() : base(
 					new Fixture()
 						.Customize(new BaseCustomization())
-						.Customize(new MyActorCustomization(42))
+						.Customize(new MyActorCustomization(_expectedValue))
 				)
 				{ }
 			}
 
 			[Theory, Arrange]
-			public async Task GetReturnsResultWithSingleElementGuidSequence(ActorsController sut)
+			public async Task GetReturnsOkResultWithSingleElementGuidSequence(ActorsController sut)
 			{
 				var result = (await sut.Get() as OkObjectResult).Value as IEnumerable<Guid>;
 
 				result.Should().HaveCount(1);
+			}
+
+			[Theory, Arrange]
+			public async Task GetReturnsOkResultWithAllActorIds(ActorsController sut, IDictionary<ActorId, IMyActor> actors)
+			{
+				var result = (await sut.Get() as OkObjectResult).Value as IEnumerable<Guid>;
+
+				result.Should().BeEquivalentTo(actors.Keys.Select(actorId => actorId.GetGuidId()));
+			}
+
+			[Theory, Arrange]
+			public async Task GetWithAddedIdReturnsOkResultWithExpectedIntValue(ActorsController sut, IDictionary<ActorId, IMyActor> actors)
+			{
+				var result = await sut.Get(actors.Keys.First().GetGuidId().ToString());
+
+				result.Should().BeOfType<OkObjectResult>();
+
+				var okResult = result as OkObjectResult;
+
+				okResult.Value.Should().BeOfType<int>();
+
+				var intValue = (int)okResult.Value;
+
+				intValue.ShouldBeEquivalentTo(_expectedValue);
+			}
+			
+			[Theory, Arrange]
+			public async Task GetWithRandomStringIdReturnsBadRequestResult(ActorsController sut, string randomId)
+			{
+				var result = await sut.Get(randomId);
+
+				result.Should().BeOfType<BadRequestObjectResult>();
+			}
+
+			[Theory, Arrange]
+			public async Task GetWithRandomGuidIdReturnsBadRequestResult(ActorsController sut, Guid randomId)
+			{
+				var result = await sut.Get(randomId.ToString());
+
+				result.Should().BeOfType<NotFoundObjectResult>();
+			}
+
+			[Theory, Arrange]
+			public async Task PutWithAddedIdReturnsOkResultWithExpectedIntValue(ActorsController sut, IDictionary<ActorId, IMyActor> actors, int value)
+			{
+				var result = await sut.Put(actors.Keys.First().GetGuidId().ToString(), value);
+
+				result.Should().BeOfType<OkObjectResult>();
+
+				var okResult = result as OkObjectResult;
+
+				okResult.Value.Should().BeOfType<int>();
+
+				var intValue = (int)okResult.Value;
+
+				intValue.ShouldBeEquivalentTo(value);
+			}
+
+			[Theory, Arrange]
+			public async Task PutWithRandomStringIdReturnsBadRequestResult(ActorsController sut, string randomId, int value)
+			{
+				var result = await sut.Put(randomId, value);
+
+				result.Should().BeOfType<BadRequestObjectResult>();
+			}
+
+			[Theory, Arrange]
+			public async Task PutWithRandomGuidIdReturnsBadRequestResult(ActorsController sut, Guid randomId, int value)
+			{
+				var result = await sut.Put(randomId.ToString(), value);
+
+				result.Should().BeOfType<NotFoundObjectResult>();
+			}
+
+			[Theory, Arrange]
+			public async Task DeleteWithAddedIdReturnsOkResult(ActorsController sut, IDictionary<ActorId, IMyActor> actors)
+			{
+				var result = await sut.Delete(actors.Keys.Single().GetGuidId().ToString());
+
+				result.Should().BeOfType<OkResult>();
+			}
+
+			[Theory, Arrange]
+			public async Task DeleteWithRandomStringIdReturnsBadRequestResult(ActorsController sut, string randomId)
+			{
+				var result = await sut.Delete(randomId);
+
+				result.Should().BeOfType<BadRequestObjectResult>();
+			}
+
+			[Theory, Arrange]
+			public async Task DeleteWithRandomGuidReturnsNotFoundResult(ActorsController sut, Guid randomId)
+			{
+				var result = await sut.Delete(randomId.ToString());
+
+				result.Should().BeOfType<NotFoundObjectResult>();
 			}
 		}
 	}
